@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Una tienda de ecommerce completa, hecha con ChatGPT y Google Flow · D-IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --papel:#FFFFFF;
+  --papel-2:#FFFFFF;
+  --raya:rgba(17,17,17,.07);
+  --tinta:#111111;
+  --tinta-2:#5c5c5c;
+  --tinta-3:#8f8f8f;
+  --naranja:#111111;
+  --naranja-cl:#ECECEC;
+  --gris-a:#3a3a3a;
+  --gris-b:#6b6b6b;
+  --gris-c:#9a9a9a;
+  --gris-d:#4a4a4a;
+
+  --sans:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+
+  --ancho:1220px;
+  --sale:cubic-bezier(.23,1,.32,1);
+  --borde:1.5px solid var(--tinta);
+  --sombra:4px 4px 0 var(--tinta);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;
+  color:var(--tinta);
+  font-family:var(--sans);
+  font-size:16px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  background-color:var(--papel);
+  background-image:
+    linear-gradient(var(--raya) 1px, transparent 1px),
+    linear-gradient(90deg, var(--raya) 1px, transparent 1px);
+  background-size:30px 30px;
+}
+img,video{display:block;max-width:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--naranja);outline-offset:3px}
+.env{width:100%;max-width:var(--ancho);margin-inline:auto;padding-inline:clamp(18px,4vw,44px)}
+
+.rotulo{
+  font-family:var(--mono);font-size:10.5px;font-weight:600;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-3);
+}
+.rotulo--eje{text-decoration:underline;text-decoration-color:var(--naranja);text-decoration-thickness:2px;text-underline-offset:4px}
+.coste__ahora__caja--azul .rotulo{text-decoration:underline;text-decoration-color:#2A5FBD;text-decoration-thickness:2px;text-underline-offset:4px}
+.coste__ahora__caja--dorado .rotulo{text-decoration:underline;text-decoration-color:#B8860B;text-decoration-thickness:2px;text-underline-offset:4px}
+.coste__ahora__caja--acento .rotulo{text-decoration:underline;text-decoration-color:#1E8449;text-decoration-thickness:2px;text-underline-offset:4px}
+
+/* ---------------- chips de herramienta ---------------- */
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--mono);font-size:10.5px;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;
+  padding:4px 13px 4px 4px;
+  border:var(--borde);border-radius:100px;
+  background:var(--papel-2);white-space:nowrap;
+}
+.ficha{
+  display:grid;place-items:center;flex:none;
+  width:23px;height:23px;border-radius:6px;overflow:hidden;
+  background:var(--papel-2);border:1px solid rgba(17,17,17,.18);
+}
+.ficha img{width:100%;height:100%;object-fit:contain;padding:2px}
+.ficha--g{width:34px;height:34px;border-radius:9px}
+.ficha--g img{padding:3px}
+
+/* ---------------- portada ---------------- */
+.portada{padding-block:clamp(56px,8vw,110px) clamp(40px,6vw,72px)}
+.portada h1{
+  font-weight:700;margin:16px 0 0;
+  font-size:clamp(38px,6.6vw,80px);line-height:1;letter-spacing:-.04em;
+  max-width:17ch;text-wrap:balance;
+}
+.portada h1 mark{
+  background:linear-gradient(transparent 62%, var(--naranja-cl) 62%);
+  color:inherit;padding:0 .06em;
+}
+.portada__bajada{
+  margin:26px 0 0;max-width:58ch;font-size:clamp(16px,1.55vw,19px);
+  color:var(--tinta-2);line-height:1.6;
+}
+.portada__bajada strong{color:var(--tinta);font-weight:600}
+.pila{display:flex;flex-wrap:wrap;gap:9px;margin-top:30px}
+.pila .chip{font-size:11px;padding:5px 15px 5px 5px;box-shadow:2px 2px 0 var(--tinta)}
+
+.cifras{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
+  gap:14px;margin-top:clamp(34px,5vw,56px);
+}
+.cifra{
+  background:var(--papel-2);border:var(--borde);border-radius:10px;
+  box-shadow:var(--sombra);padding:20px 18px;
+}
+.cifra strong{display:block;font-size:clamp(28px,3.2vw,38px);font-weight:700;line-height:1;letter-spacing:-.035em}
+.cifra span{display:block;margin-top:8px;font-size:12.5px;color:var(--tinta-2)}
+.cifra:nth-child(1) strong{color:var(--naranja)}
+.cifra:nth-child(2) strong{color:var(--gris-a)}
+.cifra:nth-child(3) strong{color:var(--gris-b)}
+.cifra:nth-child(4) strong{color:var(--gris-d)}
+
+/* ---------------- catálogo / beneficios ---------------- */
+.modelos{padding-block:clamp(40px,6vw,80px)}
+.modelos__cat{background:var(--papel-2);border:var(--borde);border-radius:10px;box-shadow:var(--sombra);padding:22px 22px 24px;margin-bottom:16px}
+.modelos__cat h3{margin:0 0 12px;font-size:16px;font-weight:700;letter-spacing:-.018em}
+.modelos__lista{display:flex;flex-wrap:wrap;gap:8px}
+.modelo{font-family:var(--mono);font-size:12px;padding:6px 12px;border-radius:100px;border:1.5px solid rgba(17,17,17,.18);background:var(--papel);color:var(--tinta-2)}
+.modelo--usado{background:var(--naranja);color:#FFFFFF;border-color:var(--tinta);font-weight:700}
+
+/* ---------------- bonus: interface atlas ---------------- */
+.bonus{padding-block:clamp(40px,6vw,80px)}
+.bonus__caja{background:var(--papel-2);border:var(--borde);border-radius:14px;box-shadow:6px 6px 0 var(--tinta);padding:clamp(26px,4vw,42px)}
+.bonus__cab{max-width:56ch}
+.bonus__cab h2{margin:12px 0 0;font-size:clamp(24px,3vw,34px);font-weight:700;letter-spacing:-.03em;line-height:1.1;text-wrap:balance}
+.bonus__cab p{margin:14px 0 0;color:var(--tinta-2)}
+.bonus__grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px}
+@media (max-width:760px){.bonus__grid{grid-template-columns:repeat(2,1fr)}}
+.bonus__estilo{background:var(--papel);border:var(--borde);border-radius:9px;overflow:hidden;box-shadow:2px 2px 0 var(--tinta)}
+.bonus__estilo img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.bonus__estilo span{display:block;padding:8px 10px;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.beneficios{padding-block:clamp(40px,6vw,80px)}
+.beneficios__cab{max-width:44ch;margin-bottom:clamp(26px,3.4vw,40px)}
+.beneficios__cab h2{
+  margin:12px 0 0;font-size:clamp(26px,3.4vw,40px);
+  font-weight:700;letter-spacing:-.032em;line-height:1.08;text-wrap:balance;
+}
+.beneficios__rejilla{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(226px,1fr));gap:16px;
+}
+.beneficio{
+  background:var(--papel-2);border:var(--borde);border-radius:10px;
+  box-shadow:var(--sombra);padding:22px 20px 24px;
+  transition:transform 180ms var(--sale),box-shadow 180ms var(--sale);
+}
+@media (hover:hover) and (pointer:fine){
+  .beneficio:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--tinta)}
+}
+.beneficio__logos{display:flex;gap:8px;margin-bottom:17px}
+.beneficio__logos .ficha{border-width:1.5px;border-color:var(--tinta);box-shadow:2px 2px 0 var(--tinta)}
+.beneficio h3{margin:0 0 8px;font-size:17px;font-weight:700;letter-spacing:-.018em;line-height:1.2}
+.beneficio p{margin:0;font-size:14px;color:var(--tinta-2);line-height:1.55}
+
+/* ---------------- recorrido ---------------- */
+.recorrido{padding-block:clamp(34px,5vw,64px) clamp(56px,8vw,104px)}
+.recorrido__cab{max-width:46ch;margin-bottom:clamp(34px,4.6vw,56px)}
+.recorrido__cab h2{
+  margin:12px 0 0;font-size:clamp(26px,3.4vw,40px);
+  font-weight:700;letter-spacing:-.032em;line-height:1.08;text-wrap:balance;
+}
+.recorrido__cab p{margin:16px 0 0;color:var(--tinta-2)}
+
+.parada{position:relative;padding-left:74px;padding-bottom:clamp(40px,5.2vw,68px)}
+.parada::before{
+  content:'';position:absolute;left:22px;top:52px;bottom:-6px;width:1.5px;
+  background:repeating-linear-gradient(var(--tinta) 0 5px, transparent 5px 11px);
+  opacity:.32;
+}
+.parada:last-child::before{display:none}
+.parada__num{
+  position:absolute;left:0;top:0;width:46px;height:46px;border-radius:50%;
+  display:grid;place-items:center;background:var(--papel-2);
+  border:var(--borde);box-shadow:3px 3px 0 var(--tinta);
+}
+.parada__num span{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.02em}
+
+.parada__cab{display:flex;align-items:center;gap:14px;flex-wrap:wrap;min-height:46px}
+.parada__cab h2{margin:0;font-size:clamp(21px,2.4vw,28px);font-weight:700;letter-spacing:-.028em;line-height:1.14}
+.parada__nota{margin:14px 0 22px;max-width:68ch;color:var(--tinta-2)}
+.parada__nota strong{color:var(--tinta);font-weight:600}
+.parada__nota code{
+  font-family:var(--mono);font-size:.88em;
+  background:var(--naranja-cl);padding:2px 6px;border-radius:4px;
+}
+.parada__nota--aviso{
+  background:#F5F5F5;border:1.5px dashed var(--tinta-3);border-radius:8px;
+  padding:10px 14px;color:var(--tinta-2);font-size:14px;max-width:68ch;
+}
+
+.adjunto{
+  display:flex;align-items:flex-start;gap:14px;
+  margin:0 0 18px;padding:12px 16px;
+  background:var(--naranja-cl);border:1.5px solid var(--naranja);border-radius:9px;
+}
+.adjunto__mini{
+  flex:none;width:52px;height:52px;border-radius:6px;object-fit:contain;
+  background:#fff;border:1px solid rgba(17,17,17,.15);padding:3px;
+}
+.adjunto__txt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.adjunto__q{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.02em}
+.adjunto__q b{font-weight:700}
+.adjunto__d{font-size:13.5px;color:var(--tinta-2)}
+.adjunto__p{font-size:13.5px;color:var(--tinta-2);margin-top:5px}
+.adjunto__p b{color:var(--tinta);font-weight:600}
+.adjunto--vacio{
+  background:var(--papel);border-color:rgba(17,17,17,.2);
+  display:block;
+}
+.adjunto--vacio .adjunto__q{display:block;margin-bottom:3px;color:var(--tinta-3);text-transform:uppercase;letter-spacing:.16em;font-size:9.5px;font-weight:600}
+.adjunto--vacio .adjunto__p{display:block;margin:0}
+.adjunto--multi{flex-wrap:wrap}
+.adjunto--multi .adjunto__mini{margin-right:2px}
+
+.parada__par{
+  display:grid;
+  grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);
+  gap:18px;
+  align-items:stretch;
+}
+.lado-codigo{position:relative;min-height:300px}
+.carta--codigo{position:absolute;inset:0;display:flex;flex-direction:column}
+
+.carta{background:var(--papel-2);border:var(--borde);border-radius:10px;box-shadow:var(--sombra);overflow:hidden}
+.carta__barra{
+  display:flex;align-items:center;gap:11px;
+  padding:9px 11px;border-bottom:var(--borde);background:var(--papel);
+}
+.puntos{display:inline-flex;gap:4px}
+.puntos i{width:7px;height:7px;border-radius:50%;border:1.2px solid var(--tinta);display:block}
+.carta__tit{
+  font-family:var(--mono);font-size:10.5px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;
+}
+.copiar{
+  margin-left:auto;
+  font-family:var(--mono);font-size:10px;font-weight:600;
+  letter-spacing:.1em;text-transform:lowercase;
+  padding:5px 12px;border-radius:100px;border:var(--borde);
+  background:var(--naranja);color:#FFFFFF;
+  transition:transform 150ms var(--sale),background 150ms ease;
+}
+@media (hover:hover) and (pointer:fine){.copiar:hover{background:var(--gris-a)}}
+.copiar:active{transform:scale(.95)}
+.copiar.ok{background:#ECECEC;color:#111111;border-color:var(--tinta)}
+
+.carta--codigo pre{
+  flex:1 1 0;min-height:0;
+  margin:0;padding:18px;overflow:auto;
+  font-family:var(--mono);font-size:12px;line-height:1.74;color:var(--tinta-2);
+  white-space:pre-wrap;word-break:break-word;
+}
+.medio{background:var(--papel)}
+.medio img,.medio video{width:100%;height:auto}
+
+.tabla-error{
+  width:100%;border-collapse:collapse;font-size:14px;margin-bottom:20px;
+  background:var(--papel-2);border:var(--borde);border-radius:10px;box-shadow:var(--sombra);overflow:hidden;
+}
+.parada__cierre{margin:18px 0 0;max-width:68ch;color:var(--tinta-2)}
+.parada__cierre strong{color:var(--naranja);font-weight:700}
+
+/* ---------------- tiempo y dinero ---------------- */
+.coste{padding-block:clamp(44px,6vw,84px)}
+.coste__cab{max-width:60ch;margin-bottom:clamp(24px,3.2vw,38px)}
+.coste__cab h2{margin:12px 0 0;font-size:clamp(26px,3.4vw,40px);font-weight:700;letter-spacing:-.032em;line-height:1.08;text-wrap:balance}
+.coste__cab p{margin:16px 0 0;color:var(--tinta-2)}
+
+.coste__tabla{
+  background:var(--papel-2);border:var(--borde);border-radius:10px;
+  box-shadow:var(--sombra);overflow:hidden;
+}
+.coste__fila{
+  display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) 130px;
+  gap:14px;padding:13px 18px;
+  border-bottom:1px solid rgba(17,17,17,.1);
+  font-size:14.5px;
+}
+.coste__fila:last-child{border-bottom:none}
+.coste__fila span:nth-child(2){font-size:13.5px;color:var(--tinta-2)}
+.coste__fila span:nth-child(3){font-family:var(--mono);font-size:12.5px;color:var(--tinta-2)}
+.coste__fila--cab{
+  background:var(--papel);border-bottom:var(--borde);
+  font-family:var(--mono);font-size:9.5px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;
+}
+.coste__fila--cab span:nth-child(2),
+.coste__fila--cab span:nth-child(3){font-size:9.5px;color:var(--tinta);font-family:var(--mono)}
+.coste__fila--total{
+  background:#FDECEA;border-top:var(--borde);font-weight:700;
+}
+.coste__fila--total span:nth-child(3){color:#B3261E;font-weight:700;font-size:13px}
+
+.coste__ahora{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:16px}
+.coste__ahora__caja{
+  background:var(--papel-2);border:var(--borde);border-radius:10px;
+  box-shadow:var(--sombra);padding:24px 22px;
+}
+.coste__ahora__caja--azul{background:#EAF2FE}
+.coste__ahora__caja--azul .coste__cifra{color:#2A5FBD}
+.coste__ahora__caja--dorado{background:#FDF3D9}
+.coste__ahora__caja--dorado .coste__cifra{color:#B8860B}
+.coste__ahora__caja--acento{background:#E6F7EC}
+.coste__cifra{
+  margin:12px 0 10px;font-size:clamp(30px,3.8vw,44px);
+  font-weight:700;letter-spacing:-.036em;line-height:1;
+}
+.coste__ahora__caja--acento .coste__cifra{color:#1E8449}
+.coste__ahora__caja small{display:block;margin-top:10px;font-family:var(--mono);font-size:11.5px;color:var(--tinta-2)}
+.coste__ahora__caja p:last-child{margin:0;font-size:14px;color:var(--tinta-2);line-height:1.55}
+
+.casos{margin:22px 0 0;padding:0;list-style:none;max-width:60ch}
+.casos li{
+  position:relative;padding-left:22px;margin-bottom:9px;
+  font-size:15px;color:var(--tinta-2);
+}
+.casos li::before{
+  content:'';position:absolute;left:0;top:9px;
+  width:8px;height:8px;border:1.5px solid var(--naranja);border-radius:2px;
+}
+
+/* ---------------- cierre ---------------- */
+.cierre{padding-block:clamp(52px,7vw,96px)}
+.cierre__caja{
+  background:var(--papel-2);border:var(--borde);border-radius:14px;
+  box-shadow:6px 6px 0 var(--tinta);
+  padding:clamp(30px,4.6vw,58px);
+}
+.cierre h2{
+  margin:14px 0 0;font-size:clamp(26px,4vw,50px);
+  font-weight:700;letter-spacing:-.038em;line-height:1.04;max-width:18ch;text-wrap:balance;
+}
+.cierre h2 mark{background:linear-gradient(transparent 62%, var(--naranja-cl) 62%);color:inherit}
+.cierre p{margin:20px 0 0;max-width:58ch;color:var(--tinta-2)}
+.enlace{
+  display:inline-flex;align-items:center;gap:9px;margin-top:28px;
+  padding:14px 24px;border-radius:100px;border:var(--borde);box-shadow:var(--sombra);
+  background:var(--naranja);color:#FFFFFF;font-weight:700;font-size:15px;text-decoration:none;
+  transition:transform 170ms var(--sale),box-shadow 170ms var(--sale);
+}
+@media (hover:hover) and (pointer:fine){.enlace:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--tinta)}}
+.enlace:active{transform:translate(0,0);box-shadow:2px 2px 0 var(--tinta)}
+
+.pie{border-top:var(--borde);padding-block:26px}
+.pie__fila{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center}
+
+@media (max-width:900px){
+  .adjunto{
+  display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 10px;
+  margin:0 0 18px;padding:10px 14px;
+  background:var(--naranja-cl);border:1.5px solid var(--naranja);border-radius:8px;
+  font-size:13.5px;
+}
+.adjunto__q{font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.adjunto__q b{font-weight:700}
+.adjunto__p{color:var(--tinta-2);font-size:13.5px;flex:1 1 240px;min-width:0}
+.adjunto--vacio{background:var(--papel);border-color:rgba(17,17,17,.2)}
+
+.parada__par{grid-template-columns:1fr}
+  .lado-codigo{position:static;min-height:0}
+  .carta--codigo{position:static}
+  .carta--codigo pre{max-height:340px}
+  .parada{padding-left:56px}
+  .parada__num{width:38px;height:38px}
+  .parada::before{left:18px;top:44px}
+}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.001ms !important}}
+
+/* ---------------- añadidos de este documento ---------------- */
+.medio__marco{
+  position:relative;min-height:280px;overflow:hidden;
+  background:
+    repeating-linear-gradient(-45deg, transparent 0 12px, rgba(17,17,17,.05) 12px 24px),
+    var(--papel);
+}
+.medio__marco img,.medio__marco video{
+  position:relative;z-index:1;width:100%;height:100%;object-fit:cover;display:block;
+}
+.medio__ph{
+  position:absolute;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:24px;font-family:var(--mono);font-size:12.5px;
+  color:var(--tinta-3);line-height:1.5;
+}
+</style>
+</head>
+<body>
+
+<header class="portada">
+  <div class="env">
+    <span class="rotulo">El recorrido completo · 24 de agosto de 2026</span>
+    <h1>Una tienda de ecommerce completa, <mark>desde cero</mark>, sin tocar un editor de código</h1>
+    <p class="portada__bajada">AMPER, unos auriculares que no existen, con su web skeuomorphism, su visor 360 interactivo, tres acabados de color y reseñas de clientes que tampoco existen. <strong>Todo hecho con ChatGPT 5.6 Sol y Google Flow</strong>, sin diseñador, sin fotógrafo y sin editor. Abajo está el camino entero, parada a parada, con el prompt exacto y lo que sale de él.</p>
+    <div class="pila">
+      <span class="chip"><span class="ficha ficha--g"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span><span>ChatGPT 5.6 Sol</span></span>
+      <span class="chip"><span class="ficha ficha--g"><img src="amper-assets/logos/gemini.webp" alt="" loading="lazy"></span><span>Google Flow</span></span>
+      <span class="chip"><span class="ficha ficha--g"><img src="amper-assets/logos/nano-banana.png" alt="" loading="lazy"></span><span>Nano Banana 2</span></span>
+    </div>
+    <div class="cifras">
+      <div class="cifra"><strong>9</strong><span>paradas con prompt</span></div>
+      <div class="cifra"><strong>3</strong><span>acabados de color distintos</span></div>
+      <div class="cifra"><strong>18</strong><span>fotos de producto generadas</span></div>
+      <div class="cifra"><strong>2</strong><span>vídeos generados con Flow</span></div>
+    </div>
+  </div>
+</header>
+
+<section class="modelos">
+  <div class="env">
+    <div class="beneficios__cab">
+      <span class="rotulo rotulo--eje">Qué hay detrás de AMPER</span>
+      <h2>El stack completo, antes de empezar</h2>
+      <p style="margin-top:14px;color:var(--tinta-2)">No hace falta saber de diseño ni de vídeo para seguir esto: en negro está lo que usamos hoy, el resto son las otras opciones que tenían las mismas herramientas.</p>
+    </div>
+    <div class="modelos__cat">
+      <h3>El ADN visual, repetido en cada prompt</h3>
+      <p style="margin:0 0 14px;font-size:14px;color:var(--tinta-2);line-height:1.6">Ninguna pieza sale bien si el prompt no repite estas mismas palabras. Es lo que hace que la foto, el vídeo y la web parezcan del mismo producto y no de tres generaciones distintas.</p>
+      <div class="modelos__lista">
+        <span class="modelo">Fondo negro/carbón, sin costura visible</span>
+        <span class="modelo">Luz única cálida ~2800K, ámbar/cobre</span>
+        <span class="modelo">Metal gunmetal cepillado, brillo concéntrico</span>
+        <span class="modelo">Cuero negro, pespunte de color a juego</span>
+        <span class="modelo">Playfair Display + DM Mono</span>
+      </div>
+    </div>
+    <div class="modelos__cat">
+      <h3>Imagen</h3>
+      <div class="modelos__lista">
+        <span class="modelo modelo--usado">GPT Image 2</span>
+        <span class="modelo">Nano Banana 2</span>
+        <span class="modelo">Nano Banana Pro</span>
+      </div>
+    </div>
+    <div class="modelos__cat">
+      <h3>Vídeo (Google Flow)</h3>
+      <div class="modelos__lista">
+        <span class="modelo modelo--usado">Veo 3.1</span>
+        <span class="modelo modelo--usado">Gemini Omni Flash</span>
+        <span class="modelo">Veo 3.1 Lite</span>
+      </div>
+    </div>
+    <div class="modelos__cat">
+      <h3>Código y orquestación</h3>
+      <div class="modelos__lista">
+        <span class="modelo modelo--usado">ChatGPT 5.6 Sol (razonamiento alto)</span>
+        <span class="modelo">GPT-5.5</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main class="recorrido">
+  <div class="env">
+    <div class="recorrido__cab">
+      <span class="rotulo">Parada a parada</span>
+      <h2>De la primera línea a la tienda entera</h2>
+      <p>Cada parada lleva el prompt exacto a la izquierda y lo que sale de él a la derecha, en el orden real en el que se construyó AMPER.</p>
+    </div>
+
+    <article class="parada" id="p1">
+      <div class="parada__num"><span>P1</span></div>
+      <div class="parada__cuerpo">
+        <header class="parada__cab">
+          <h2>La imagen ancla: crea tu producto o parte de uno real</h2>
+          <div class="chips"><span class="chip"><span class="ficha"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span><span>ChatGPT 5.6 Sol</span></span><span class="chip"><span class="ficha"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span><span>GPT Image 2</span></span></div>
+        </header>
+        <p class="parada__nota">Todo lo que viene después depende de esta única imagen. Dos caminos según tu caso: si no tienes producto, lo inventas de cero; si ya vendes algo real, partes de una foto tuya, aunque sea de móvil. <strong>En AMPER, esta imagen salió como parte del mismo prompt que la home (P2): aquí se separa para que puedas generarla sola.</strong></p>
+        <div class="adjunto adjunto--vacio"><span class="adjunto__q">Qué adjuntar (Prompt 1)</span><span class="adjunto__p">Nada. Es el único camino que parte de cero.</span></div>
+        <div class="parada__par" style="margin-bottom:14px">
+          <div class="lado-codigo">
+          <div class="carta carta--codigo">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">Prompt 1 · Crear desde cero</span>
+              <button class="copiar" type="button" data-copiar>copiar</button>
+            </div>
+            <pre>Create a premium studio product photo of "AMPER A-01", a pair of over-ear wireless headphones. Brushed dark gunmetal metal and stitched black leather, with a glowing amber dial (volume/EQ), bevelled edges, realistic inset shadows and controlled highlights that communicate real materials, not flat icons. Floating in a deep charcoal/black void, single warm amber rim light wrapping the object. No stock photography, no people, no props, no text or logos. 3/4 angle, sharp focus.</pre>
+          </div>
+          </div>
+          <div class="carta carta--medio">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El resultado</span>
+            </div>
+            <div class="medio"><div class="medio__marco"><img src="amper-assets/anchor.png" alt="Imagen ancla: auriculares AMPER A-01 aislados en el vacío negro" loading="lazy" onerror="this.style.display='none'"><div class="medio__ph">📸 Pendiente: sube aquí la imagen ancla</div></div></div>
+          </div>
+        </div>
+        <div class="adjunto"><span class="adjunto__txt"><span class="adjunto__q">Qué adjuntar (Prompt 2)</span><span class="adjunto__d">tu propia foto del producto real: vale una foto de móvil, no hace falta que sea buena</span></span></div>
+        <div class="parada__par">
+          <div class="lado-codigo">
+          <div class="carta carta--codigo">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">Prompt 2 · Partir de tu producto real</span>
+              <button class="copiar" type="button" data-copiar>copiar</button>
+            </div>
+            <pre>Using the attached reference photo of my product, recreate it as a premium studio product photo: floating in a deep charcoal/black void, single warm amber rim light wrapping the object, sharp focus, realistic materials preserved exactly as in the reference. Do not redesign the product — only change the studio treatment, lighting and background. No stock photography, no people, no props, no text or logos.</pre>
+          </div>
+          </div>
+          <div class="carta carta--medio">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">Nota</span>
+            </div>
+            <div class="medio" style="min-height:180px;padding:24px;display:flex;align-items:center;justify-content:center;text-align:center"><p style="margin:0;font-family:var(--mono);font-size:12.5px;color:var(--tinta-3);line-height:1.6">Mismo resultado que el Prompt 1, pero anclado a tu producto real en vez de inventado. El resto del recorrido (P2 en adelante) es idéntico a partir de aquí.</p></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="parada" id="p2">
+      <div class="parada__num"><span>P2</span></div>
+      <div class="parada__cuerpo">
+        <header class="parada__cab">
+          <h2>La home, estilo skeuomorphism</h2>
+          <div class="chips"><span class="chip"><span class="ficha"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span><span>ChatGPT 5.6 Sol</span></span></div>
+        </header>
+        <p class="parada__nota">Con la imagen ancla de P1 ya lista, este prompt construye la home entera alrededor de ella: marca, materiales y tipografía.</p>
+        <div class="adjunto"><img class="adjunto__mini" src="amper-assets/anchor.png" alt="" loading="lazy" onerror="this.style.display='none'"><span class="adjunto__txt"><span class="adjunto__q">Adjunta: <b>anchor.png</b></span><span class="adjunto__d">la imagen ancla de P1</span></span></div>
+        <div class="parada__par">
+          <div class="lado-codigo">
+          <div class="carta carta--codigo">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El prompt</span>
+              <button class="copiar" type="button" data-copiar>copiar</button>
+            </div>
+            <pre>Create a premium, one-screen desktop landing page for "AMPER", a premium wireless headphones brand. The page should feel tactile, mechanical and precision-engineered, like a piece of high-end audio hardware translated into a website: modernist grid, but skeuomorphic materials.
+
+Use a deep charcoal studio background with subtle grain, warm ivory typography, a bold serif headline on the left that reads "Sound, engineered." with the eyebrow "AMPER — PRECISION AUDIO", short supporting copy, and a raised physical-looking "Build your pair ▶" button with realistic bevel and shadow.
+
+On the right, render a large hero product shot: a pair of over-ear headphones in brushed dark metal and stitched leather, with a glowing amber dial (volume/EQ), bevelled edges, realistic inset shadows and controlled highlights that communicate real materials, not flat icons.
+
+Include a compact AMPER wordmark, minimal nav (Home / Build / Reviews / Support), and a thin metallic divider line. Typography: Playfair Display for the headline, DM Mono for utility labels and specs. No stock photography, no generic gradients, no flat/glass UI anywhere on this page.</pre>
+          </div>
+          </div>
+          <div class="carta carta--medio">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El resultado</span>
+            </div>
+            <div class="medio"><div class="medio__marco"><img src="amper-assets/landing-home.png" alt="Home de AMPER, hero skeuomorphism con los auriculares y el titular Sonido, diseñado" loading="lazy" onerror="this.style.display='none'"><div class="medio__ph">📸 Pendiente: sube aquí la home</div></div></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="parada" id="p3">
+      <div class="parada__num"><span>P3</span></div>
+      <div class="parada__cuerpo">
+        <header class="parada__cab">
+          <h2>La imagen ancla y los 18 ángulos de producto</h2>
+          <div class="chips"><span class="chip"><span class="ficha"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span><span>ChatGPT 5.6 Sol</span></span><span class="chip"><span class="ficha"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span><span>GPT Image 2</span></span></div>
+        </header>
+        <p class="parada__nota">Con la imagen ancla de P1, un solo prompt genera <strong>6 ángulos × 3 acabados = 18 fotos</strong>, todas ancladas a la misma pieza para que no cambie de forma entre una y otra.</p>
+        <div class="adjunto"><img class="adjunto__mini" src="amper-assets/anchor.png" alt="" loading="lazy" onerror="this.style.display='none'"><span class="adjunto__txt"><span class="adjunto__q">Adjunta esta imagen: <b>anchor.png</b></span><span class="adjunto__d">la imagen ancla de P1, el único producto de referencia</span></span></div>
+        <div class="parada__par">
+          <div class="lado-codigo">
+          <div class="carta carta--codigo">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El prompt</span>
+              <button class="copiar" type="button" data-copiar>copiar</button>
+            </div>
+            <pre>Generate 6 product shots of the AMPER A-01 headphones from different angles: front 3/4, side profile, top-down, macro on the control dial, macro on the leather stitching, and rear/headband view. Keep the exact same floating-in-black-void studio style, warm amber rim light and gunmetal brushed metal as the hero image already generated.
+
+Repeat the same 6 angles for two more finishes:
+- "Matte Black / Copper": matte black metal, copper rim light, copper stitching
+- "Warm Silver / Rose Gold": brushed silver metal, rose-gold rim light, rose-gold stitching
+
+Keep proportions, geometry and camera framing IDENTICAL across all three finishes so they can be swapped instantly without any visual jump. 18 images total.</pre>
+          </div>
+          </div>
+          <div class="carta carta--medio">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El resultado · 1 de 18</span>
+            </div>
+            <div class="medio"><div class="medio__marco"><img src="amper-assets/angulo-front-3q.png" alt="Ángulo frontal 3/4 del auricular AMPER, acabado Grafito y Ámbar" loading="lazy" onerror="this.style.display='none'"><div class="medio__ph">📸 Pendiente: ángulo frontal</div></div></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="parada" id="p4">
+      <div class="parada__num"><span>P4</span></div>
+      <div class="parada__cuerpo">
+        <header class="parada__cab">
+          <h2>Visor 360 y color dinámico por acabado</h2>
+          <div class="chips"><span class="chip"><span class="ficha"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span><span>ChatGPT 5.6 Sol</span></span></div>
+        </header>
+        <p class="parada__nota">Con las 18 fotos de P3, la home pasa de imagen fija a visor arrastrable: cada acabado tiene sus 6 ángulos, y al elegir uno el brillo del dial y los acentos de toda la página cambian de color con él.</p>
+        <div class="adjunto adjunto--multi">
+          <img class="adjunto__mini" src="amper-assets/angulo-front-3q.png" alt="" loading="lazy" onerror="this.style.display='none'">
+          <img class="adjunto__mini" src="amper-assets/angulo-side.png" alt="" loading="lazy" onerror="this.style.display='none'">
+          <img class="adjunto__mini" src="amper-assets/angulo-macro-dial.png" alt="" loading="lazy" onerror="this.style.display='none'">
+          <span class="adjunto__txt"><span class="adjunto__q">Adjuntan las 18 imágenes de P3</span><span class="adjunto__d">las 6 por acabado, para que el visor tenga de dónde tirar</span></span>
+        </div>
+        <div class="parada__par">
+          <div class="lado-codigo">
+          <div class="carta carta--codigo">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El prompt</span>
+              <button class="copiar" type="button" data-copiar>copiar</button>
+            </div>
+            <pre>Using the 18 images just generated (3 finishes × 6 angles), replace the static hero product image on the home page with a draggable 360 viewer: dragging left/right cycles through the 6 angles of the currently selected finish, smooth, no inertia glitches.
+
+Add 3 finish swatches near the hero (Graphite/Amber, Matte Black/Copper, Warm Silver/Rose Gold). Clicking one swaps the active image sequence to that finish AND smoothly transitions the page's accent color (rim glow, button highlight, dial underline) to match that finish's rim-light color. Keep layout, typography and copy exactly as is.</pre>
+          </div>
+          </div>
+          <div class="carta carta--medio">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El resultado</span>
+            </div>
+            <div class="medio"><div class="medio__marco"><img src="amper-assets/visor-360.png" alt="Visor 360 interactivo con selector de acabados" loading="lazy" onerror="this.style.display='none'"><div class="medio__ph">📸 Pendiente: código verificado y funcionando, falta solo la captura de pantalla en vivo (no la puedo generar yo, hace falta navegador real)</div></div></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="parada" id="p5">
+      <div class="parada__num"><span>P5</span></div>
+      <div class="parada__cuerpo">
+        <header class="parada__cab">
+          <h2>La página de producto, con carrusel y reseñas</h2>
+          <div class="chips"><span class="chip"><span class="ficha"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span><span>ChatGPT 5.6 Sol</span></span></div>
+        </header>
+        <p class="parada__nota">Specs, selector de acabado y precio, reutilizando el mismo visor de P4. Las reseñas de esta captura estuvieron en revisión: los personajes no llevaban el modelo correcto de auricular y las fotos salían demasiado pequeñas para ampliarlas, corregido en P6.</p>
+        <div class="adjunto adjunto--vacio"><span class="adjunto__q">Qué adjuntar</span><span class="adjunto__p">Nada nuevo: reutiliza las 18 imágenes de P3, ya en el proyecto.</span></div>
+        <div class="parada__par">
+          <div class="lado-codigo">
+          <div class="carta carta--codigo">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El prompt</span>
+              <button class="copiar" type="button" data-copiar>copiar</button>
+            </div>
+            <pre>Build out the "Build" section already linked in the nav: a full product detail page for AMPER A-01 with (1) an image carousel using the same 6-angle sequence per finish, with the same 3 finish swatches, wired the same way as the home page; (2) the specs strip (driver / battery / chassis) reused from the home page; (3) price "€349" and an "Add to cart" button matching the existing button style.</pre>
+          </div>
+          </div>
+          <div class="carta carta--medio">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El resultado</span>
+            </div>
+            <div class="medio"><div class="medio__marco"><img src="amper-assets/producto-one-final.png" alt="Página de producto AMPER One, versión final: acabados antes de especificaciones, aire y letra legible" loading="lazy" onerror="this.style.display='none'"><div class="medio__ph">📸 Pendiente: sube aquí la captura final</div></div></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="parada" id="p6">
+      <div class="parada__num"><span>P6</span></div>
+      <div class="parada__cuerpo">
+        <header class="parada__cab">
+          <h2>Reseñas caseras, no de estudio</h2>
+          <div class="chips"><span class="chip"><span class="ficha"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span><span>ChatGPT 5.6 Sol</span></span><span class="chip"><span class="ficha"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span><span>GPT Image 2</span></span></div>
+        </header>
+        <p class="parada__nota">Dos vueltas. Primero, tres retratos de estudio con nombre y cara propios. Después, la corrección: una reseña con luz de estudio dramática huele a anuncio, no a cliente real, así que la segunda vuelta cambia el tratamiento, misma cara, misma persona, foto de móvil en casa, con el producto correcto y ampliable en lightbox.</p>
+        <div class="adjunto adjunto--vacio"><span class="adjunto__q">Qué adjuntar (Prompt 1)</span><span class="adjunto__p">Nada. Son solo retratos de cara, el producto no aparece todavía.</span></div>
+        <div class="parada__par" style="margin-bottom:14px">
+          <div class="lado-codigo">
+          <div class="carta carta--codigo">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">Prompt 1 · Retratos de estudio</span>
+              <button class="copiar" type="button" data-copiar>copiar</button>
+            </div>
+            <pre>Generate 3 square editorial studio portrait photos of 3 different people (one woman, two men, diverse ages). Deep charcoal, almost black background, no visible seam. Single warm practical light source grazing the hair and one side of the face from above, cinematic Rembrandt-style falloff into shadow, natural skin tones, sharp focus on the eyes, shallow depth of field. Dark neutral clothing (collared shirt or plain top), no patterns, no logos. Each person looks directly at camera or slightly off-angle, calm and neutral expression. Moody, premium color grade, no text, no watermarks.</pre>
+          </div>
+          </div>
+          <div class="carta carta--medio">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El resultado · 3 retratos</span>
+            </div>
+            <div class="medio" style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px"><img src="amper-assets/review-lucia-estudio.png" alt="Retrato de estudio de Lucía" loading="lazy" onerror="this.style.display='none'" style="width:100%;height:100%;object-fit:cover"><img src="amper-assets/review-mateo-estudio.png" alt="Retrato de estudio de Mateo" loading="lazy" onerror="this.style.display='none'" style="width:100%;height:100%;object-fit:cover"><img src="amper-assets/review-noa-estudio.png" alt="Retrato de estudio de Noa" loading="lazy" onerror="this.style.display='none'" style="width:100%;height:100%;object-fit:cover"></div>
+          </div>
+        </div>
+        <div class="adjunto"><img class="adjunto__mini" src="amper-assets/anchor.png" alt="" loading="lazy" onerror="this.style.display='none'"><span class="adjunto__txt"><span class="adjunto__q">Adjunta (Prompt 2): <b>anchor.png</b> + los 3 retratos de estudio de arriba</span><span class="adjunto__d">para que la cara no cambie y el auricular sea el correcto</span></span></div>
+        <div class="parada__par">
+          <div class="lado-codigo">
+          <div class="carta carta--codigo">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">Prompt 2 · Corrección a foto casera</span>
+              <button class="copiar" type="button" data-copiar>copiar</button>
+            </div>
+            <pre>The casual review photos for Lucía, Mateo and Noa show headphones that don't match the AMPER A-01 product design. Regenerate all three using the anchor image as reference, so the headphones in every review photo are pixel-consistent with the product shots — same gunmetal brushed metal, same amber rim light, same dial.
+
+Natural window light, phone-camera framing, slightly off-center, headphones either worn or resting on a home table/desk/sofa — no studio rim lighting, no black void background, should look like a real customer photo, not an ad shot.
+
+Also add a lightbox: clicking any product or review photo opens it full-size in an overlay, dismissible by clicking outside or pressing Escape.</pre>
+          </div>
+          </div>
+          <div class="carta carta--medio">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El resultado</span>
+            </div>
+            <div class="medio"><div class="medio__marco"><img src="amper-assets/resenas-caseras.png" alt="Lucía en el sofá de casa con sus AMPER A-01, foto casera corregida" loading="lazy" onerror="this.style.display='none'"><div class="medio__ph">📸 Pendiente: sube aquí la reseña corregida</div></div></div>
+          </div>
+        </div>
+        <p class="parada__nota parada__nota--aviso">💡 Si el producto no sale bien en la foto (cambia de forma, de material o de color), el arreglo casi siempre es el mismo: mete más imágenes de referencia, no solo una. Cuantas más caras del producto le des, menos espacio le dejas al modelo para inventar.</p>
+      </div>
+    </article>
+
+    <article class="parada" id="p7">
+      <div class="parada__num"><span>P7</span></div>
+      <div class="parada__cuerpo">
+        <header class="parada__cab">
+          <h2>El vídeo orbital del producto</h2>
+          <div class="chips"><span class="chip"><span class="ficha"><img src="amper-assets/logos/gemini.webp" alt="" loading="lazy"></span><span>Veo 3.1 · Google Flow</span></span></div>
+        </header>
+        <p class="parada__nota">Con una sola imagen de referencia, Flow perdía el dial mecánico en el ángulo frontal: se inventaba lo que no había visto. Arreglado con <strong>3 imágenes de referencia reales</strong> (no texto solo) y un arco de giro limitado, no 360° completos.</p>
+        <div class="adjunto adjunto--multi">
+          <img class="adjunto__mini" src="amper-assets/angulo-front-3q.png" alt="" loading="lazy" onerror="this.style.display='none'">
+          <img class="adjunto__mini" src="amper-assets/angulo-side.png" alt="" loading="lazy" onerror="this.style.display='none'">
+          <img class="adjunto__mini" src="amper-assets/angulo-macro-dial.png" alt="" loading="lazy" onerror="this.style.display='none'">
+          <span class="adjunto__txt"><span class="adjunto__q">Adjunta 3 fotos: frontal 3/4, perfil, macro del dial</span><span class="adjunto__d">Frames to Video / Ingredients to Video, tope real de Veo 3.1</span></span>
+        </div>
+        <div class="parada__par">
+          <div class="lado-codigo">
+          <div class="carta carta--codigo">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El prompt</span>
+              <button class="copiar" type="button" data-copiar>copiar</button>
+            </div>
+            <pre>Orbit shot of the AMPER A-01 wireless headphones floating in pure black void, no visible surface or seam. Rotate smoothly within a 45-60 degree arc around the anchor angle shown in the reference images — do not rotate to a full front-on view. Single warm amber/copper rim light (~2800K) wraps the object from behind and below, creating a soft glowing halo that separates it from the black background, exactly like premium studio audio product photography. Gunmetal brushed metal earcup with concentric circular brushing catches the light as it rotates; keep the mechanical control dial (raised knurled edge, circular concentric brushing, small amber indicator) fully visible and consistent with the reference images at all times — do not simplify or lose this detail. Black leather headband and earpads with warm copper stitching. Smooth, slow, deliberate rotation, no camera shake, soft vignette at the edges of frame. 8 seconds, 1080p, no text, no logos added by the model.</pre>
+          </div>
+          </div>
+          <div class="carta carta--medio">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El resultado</span>
+            </div>
+            <div class="medio"><div class="medio__marco"><video src="amper-assets/orbit-360.mp4" muted loop playsinline autoplay preload="metadata" controls aria-label="Vídeo orbital de AMPER, generado con Veo 3.1" onerror="this.style.display='none'"></video><div class="medio__ph">🎬 Pendiente: vídeo orbital</div></div></div>
+          </div>
+        </div>
+        <p class="parada__nota parada__nota--aviso">💡 Alternativa: el mismo prompt funciona con <strong>Gemini Omni Flash</strong> en vez de Veo 3.1. Sale más barato, admite más imágenes de referencia (hasta unas 7, frente a las 3 de Veo 3.1) y da resultados igual de buenos.</p>
+      </div>
+    </article>
+
+    <article class="parada" id="p8">
+      <div class="parada__num"><span>P8</span></div>
+      <div class="parada__cuerpo">
+        <header class="parada__cab">
+          <h2>El intro bailando + la apertura de la web</h2>
+          <div class="chips"><span class="chip"><span class="ficha"><img src="amper-assets/logos/gemini.webp" alt="" loading="lazy"></span><span>Gemini Omni Flash · Google Flow</span></span><span class="chip"><span class="ficha"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span><span>ChatGPT 5.6 Sol</span></span></div>
+        </header>
+        <p class="parada__nota">El vídeo se genera en Flow con Omni Flash; el montaje del overlay lo escribe ChatGPT. Reproduce el clip entero, sin cortarlo antes de tiempo, y deja pasar directo a la web con el botón de saltar abajo a la derecha.</p>
+        <div class="adjunto"><img class="adjunto__mini" src="amper-assets/anchor.png" alt="" loading="lazy" onerror="this.style.display='none'"><span class="adjunto__txt"><span class="adjunto__q">Adjunta: <b>anchor.png</b> + 1-2 ángulos más si puedes</span><span class="adjunto__d">para que el metal y el ámbar no desentonen con el resto. Cuantas más referencias reales le des (hasta el tope del modelo), más consistente sale el producto en el vídeo</span></span></div>
+        <div class="parada__par" style="margin-bottom:14px">
+          <div class="lado-codigo">
+          <div class="carta carta--codigo">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">Prompt · vídeo (Flow)</span>
+              <button class="copiar" type="button" data-copiar>copiar</button>
+            </div>
+            <pre>A stylish person dancing energetically in a dim, moody room lit with warm amber practical lights, wearing the AMPER A-01 over-ear headphones with visible brushed gunmetal earcups and amber-lit control dial. Confident rhythmic movement, shallow depth of field, cinematic grade: warm highlights, black shadows, subtle lens flare from the amber light source. Camera slowly orbits around the subject. 6 seconds, 1080p, no text, no logos.</pre>
+          </div>
+          </div>
+          <div class="carta carta--medio">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El resultado</span>
+            </div>
+            <div class="medio"><div class="medio__marco"><video src="amper-assets/intro-baile.mp4" muted loop playsinline autoplay preload="metadata" controls aria-label="Persona bailando con los AMPER puestos, generado con Omni Flash" onerror="this.style.display='none'"></video><div class="medio__ph">🎬 Pendiente: vídeo intro</div></div></div>
+          </div>
+        </div>
+        <div class="parada__par">
+          <div class="lado-codigo">
+          <div class="carta carta--codigo">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">Prompt · overlay (ChatGPT)</span>
+              <button class="copiar" type="button" data-copiar>copiar</button>
+            </div>
+            <pre>Add a full-screen intro overlay that plays on page load: a video file named intro.mp4, covering the entire viewport, sound on. Play the video to its natural end — do not cut it short at a fixed timer. Add a small "Skip intro ↦" button, bottom-right, visible after 1 second, letting users skip early.</pre>
+          </div>
+          </div>
+          <div class="carta carta--medio">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El intro, ya arreglado y en vivo</span>
+            </div>
+            <div class="medio"><div class="medio__marco"><img src="amper-assets/intro-corte-arreglado.png" alt="Intro reproduciéndose entero en la web, con el botón de saltar abajo a la derecha" loading="lazy" onerror="this.style.display='none'"><div class="medio__ph">📸 Pendiente: sube aquí la captura</div></div></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="parada" id="p9">
+      <div class="parada__num"><span>P9</span></div>
+      <div class="parada__cuerpo">
+        <header class="parada__cab">
+          <h2>El ensamblaje explosionado: 16-20 sub-imágenes para una sola escena</h2>
+          <div class="chips"><span class="chip"><span class="ficha"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span><span>ChatGPT 5.6 Sol</span></span><span class="chip"><span class="ficha"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span><span>GPT Image 2</span></span></div>
+        </header>
+        <p class="parada__nota">El momento estrella del hero no es una imagen: es <strong>16 a 20 fotogramas</strong> que van de las piezas sueltas flotando al producto montado, ancladas todas a la misma imagen ancla para que no cambien de forma. Se recorren con la misma técnica de scroll-scrubbing de P4: no es una animación nueva, es la misma técnica con otra secuencia. Extrapolable a cualquier producto con piezas reconocibles: un reloj, un frasco con tapón, unas zapatillas.</p>
+        <div class="adjunto"><img class="adjunto__mini" src="amper-assets/anchor.png" alt="" loading="lazy" onerror="this.style.display='none'"><span class="adjunto__txt"><span class="adjunto__q">Adjunta: <b>anchor.png</b></span><span class="adjunto__d">para que cada pieza suelta coincida en forma y material con el producto ya montado</span></span></div>
+        <div class="parada__par">
+          <div class="lado-codigo">
+          <div class="carta carta--codigo">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El prompt</span>
+              <button class="copiar" type="button" data-copiar>copiar</button>
+            </div>
+            <pre>Add an exploded-to-assembled image sequence, using the SAME scroll-scrubbing technique as the existing 36-frame rotation (not a CSS/JS animation): generate a new sequence of about 16-20 frames showing the AMPER A-01's components (ear cup shells, driver, ear cushions, headband, control dial) starting fully separated/floating apart in the black void, progressively converging frame by frame, ending on the fully assembled product in the exact same pose/framing as frame 001 of the existing rotation sequence. Same void background, same amber rim light, same materials throughout — anchored on the existing anchor image so every frame matches the final product exactly. Wire this as the FIRST scroll-scrub sequence in the hero (assembly), then continue into the existing 36-frame rotation sequence once assembled — one continuous scroll-scrub, not two separate systems.</pre>
+          </div>
+          </div>
+          <div class="carta carta--medio">
+            <div class="carta__barra">
+              <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="carta__tit">El resultado</span>
+            </div>
+            <div class="medio"><div class="medio__marco"><img src="amper-assets/ensamblaje-explosionado.png" alt="Fotograma 1 de la secuencia de ensamblaje explosionado de AMPER, piezas separadas en el vacío negro" loading="lazy" onerror="this.style.display='none'"><div class="medio__ph">📸 Pendiente: sube aquí el fotograma</div></div></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<section class="beneficios">
+  <div class="env">
+    <div class="beneficios__cab">
+      <span class="rotulo rotulo--eje">Para qué sirve esto</span>
+      <h2>No es una web de auriculares: es una tienda entera para cualquier producto</h2>
+    </div>
+    <div class="beneficios__rejilla">
+      <article class="beneficio">
+        <div class="beneficio__logos"><span class="ficha ficha--g"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span></div>
+        <h3>Landing y ficha de producto</h3>
+        <p>Un prompt de marca, un producto inventado o real, y sale la home completa en el estilo visual que elijas: skeuomorphism, glass, brutalism o cualquiera de los nueve.</p>
+      </article>
+      <article class="beneficio">
+        <div class="beneficio__logos"><span class="ficha ficha--g"><img src="amper-assets/logos/chatgpt.png" alt="" loading="lazy"></span></div>
+        <h3>Catálogo fotográfico completo</h3>
+        <p>18 fotos de producto, 3 acabados, sin sesión ni fotógrafo. La misma imagen ancla sostiene todo el catálogo sin que el producto cambie de forma.</p>
+      </article>
+      <article class="beneficio">
+        <div class="beneficio__logos"><span class="ficha ficha--g"><img src="amper-assets/logos/gemini.webp" alt="" loading="lazy"></span></div>
+        <h3>Vídeo de producto y de marca</h3>
+        <p>El giro de producto y el vídeo de marca del intro, ambos anclados a la misma imagen para que nada desentone entre foto y vídeo.</p>
+      </article>
+      <article class="beneficio">
+        <div class="beneficio__logos"><span class="ficha ficha--g"><img src="amper-assets/logos/nano-banana.png" alt="" loading="lazy"></span></div>
+        <h3>Prueba social realista</h3>
+        <p>Reseñas con foto casera, no de estudio: la diferencia entre que un visitante confíe en lo que ve o lo lea como un anuncio más.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="coste">
+  <div class="env">
+    <div class="coste__cab">
+      <span class="rotulo rotulo--eje">Lo que esto costaba hace un año</span>
+      <h2>Agencia, fotógrafo y desarrollador, contra una tarde y un plan de pago</h2>
+      <p>Sacar una tienda como AMPER hacía falta contratar a varios perfiles distintos y esperar semanas a que cada uno terminara el suyo.</p>
+    </div>
+
+    <div class="coste__tabla">
+      <div class="coste__fila coste__fila--cab">
+        <span>Lo que hacía falta</span><span>Quién</span><span>Tiempo</span>
+      </div>
+      <div class="coste__fila"><span>Sesión de fotos de producto, varios acabados</span><span>Fotógrafo y estudio</span><span>Días</span></div>
+      <div class="coste__fila"><span>Diseño de la web y de la ficha de producto</span><span>Diseñador UI</span><span>Días</span></div>
+      <div class="coste__fila"><span>Maquetación e interactividad (visor, colores)</span><span>Desarrollador front-end</span><span>Días</span></div>
+      <div class="coste__fila"><span>Vídeo de marca y de producto</span><span>Productora</span><span>1-2 jornadas</span></div>
+      <div class="coste__fila coste__fila--total"><span>Total</span><span>Equipo completo</span><span>Semanas, miles de euros</span></div>
+    </div>
+
+    <div class="coste__ahora">
+      <div class="coste__ahora__caja coste__ahora__caja--azul">
+        <span class="rotulo">Lo que tarda ahora</span>
+        <p class="coste__cifra">Una tarde</p>
+        <p>Tú solo, sin coordinar fotógrafo, diseñador ni desarrollador. Lo que cambia es que ahora hay que saber pedirlo: el prompt es el oficio nuevo.</p>
+      </div>
+      <div class="coste__ahora__caja coste__ahora__caja--dorado">
+        <span class="rotulo">Y esto es lo que cuesta de verdad</span>
+        <p class="coste__cifra">Un plan mensual (como mucho)</p>
+        <p>ChatGPT Plus/Pro y los créditos de Flow, no facturas de agencia. Un gasto real, muy por debajo de contratar equipo completo.</p>
+        <small>Google Flow da 50 créditos gratis al día: de sobra para generar vídeos sin pagar nada</small>
+      </div>
+      <div class="coste__ahora__caja coste__ahora__caja--acento">
+        <span class="rotulo">Y esto es lo que ganas tú</span>
+        <p class="coste__cifra">Servicios nuevos</p>
+        <p>Montar tiendas o landings así para clientes con producto físico o digital, cobrando por el resultado, no pagando la herramienta, o montar campañas de anuncios enteras desde 0 a partir de un solo producto.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bonus">
+  <div class="env">
+    <div class="bonus__caja">
+      <div class="bonus__cab">
+        <span class="rotulo rotulo--eje">De propina, por quedarte hasta el final</span>
+        <h2>AMPER usó skeuomorphism. Aquí tienes los otros 8 estilos, con su guía y sus prompts</h2>
+        <p>Mismo sistema que hoy: cada estilo trae su prompt de landing listo para pegar y su guía de cuándo usarlo. Pruébalos con tu propio producto.</p>
+      </div>
+      <div class="bonus__grid">
+        <div class="bonus__estilo"><img src="amper-assets/atlas-styles/style-glass.png" alt="Estilo Glassmorphism" loading="lazy"><span>Glassmorphism</span></div>
+        <div class="bonus__estilo"><img src="amper-assets/atlas-styles/style-liquid.png" alt="Estilo Liquid Glass" loading="lazy"><span>Liquid Glass</span></div>
+        <div class="bonus__estilo"><img src="amper-assets/atlas-styles/style-spatial.png" alt="Estilo Spatial UI" loading="lazy"><span>Spatial UI</span></div>
+        <div class="bonus__estilo"><img src="amper-assets/atlas-styles/style-clay.png" alt="Estilo Claymorphism" loading="lazy"><span>Claymorphism</span></div>
+        <div class="bonus__estilo"><img src="amper-assets/atlas-styles/style-neo.png" alt="Estilo Neomorphism" loading="lazy"><span>Neomorphism</span></div>
+        <div class="bonus__estilo"><img src="amper-assets/atlas-styles/style-minimal.png" alt="Estilo Minimalism" loading="lazy"><span>Minimalism</span></div>
+        <div class="bonus__estilo"><img src="amper-assets/atlas-styles/style-maxi.png" alt="Estilo Maximalism" loading="lazy"><span>Maximalism</span></div>
+        <div class="bonus__estilo"><img src="amper-assets/atlas-styles/style-brutal.png" alt="Estilo Brutalism" loading="lazy"><span>Brutalism</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cierre">
+  <div class="env">
+    <div class="cierre__caja">
+      <span class="rotulo rotulo--eje">Y esto no va solo de unos auriculares</span>
+      <h2>Lo mismo, aplicado a <mark>lo que vendas tú</mark></h2>
+      <p>El sistema no sabe qué producto es. Sirve igual para moda, cosmética, un infoproducto o cualquier servicio digital sin nada físico que fotografiar.</p>
+      <ul class="casos">
+        <li>Una marca que necesita su tienda online sin contratar agencia</li>
+        <li>Un infoproducto que no tiene nada físico que fotografiar</li>
+        <li>Un cliente que quiere testear varios estilos de marca antes de decidir</li>
+        <li>Una agencia que quiere vender esto como servicio sin montar un estudio</li>
+        <li>Varias variantes de anuncio del mismo producto para testear en Meta Ads</li>
+      </ul>
+      <a class="enlace" href="https://desarrollosconia.com/mentorias-domingos/?utm_source=youtube&utm_medium=video&utm_campaign=amper-chatgpt-flow-martin">Entra en la comunidad &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<footer class="pie">
+  <div class="env pie__fila">
+    <span class="rotulo">Hecho con ChatGPT 5.6 Sol + Google Flow</span>
+    <span class="rotulo">D-IA · Martín Toledo</span>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('[data-copiar]').forEach(function(b){
+  b.addEventListener('click', function(){
+    var txt = b.closest('.carta').querySelector('pre').textContent;
+    navigator.clipboard.writeText(txt).then(function(){
+      b.textContent = 'copiado';
+      b.classList.add('ok');
+      setTimeout(function(){ b.textContent = 'copiar'; b.classList.remove('ok'); }, 1400);
+    });
+  });
+});
+</script>
+</body>
+</html>
